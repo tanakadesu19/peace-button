@@ -76,8 +76,11 @@ button.addEventListener("click", async () => {
     } finally {
         setTimeout(() => {
             button.classList.remove("pressed");
+        }, 180);
+
+        setTimeout(() => {
             peaceMessage.classList.remove("show");
-        }, 800);
+        }, 700);
 
         button.disabled = false;
     }
