@@ -31,7 +31,25 @@ loadGlobalCount();
 button.addEventListener("click", async () => {
     button.disabled = true;
 
+    // 押した瞬間に画面を反応させる
+    const previousMyCount = myCount;
+    const previousGlobalCount =
+        Number(globalCountText.textContent.replace("回", "")) || 0;
+
+    myCount++;
+    localStorage.setItem("peaceCount", myCount);
+
+    myCountText.textContent = myCount + "回";
+    globalCountText.textContent = previousGlobalCount + 1 + "回";
+
+    peaceMessage.textContent = "🕊️ 平和 +1";
+    peaceMessage.classList.remove("show");
+    void peaceMessage.offsetWidth;
+    peaceMessage.classList.add("show");
+    button.classList.add("pressed");
+
     try {
+        // 裏側でサーバーへ送信
         const response = await fetch("/api/count", {
             method: "POST"
         });
@@ -42,32 +60,25 @@ button.addEventListener("click", async () => {
             throw new Error(result.message || "更新に失敗しました");
         }
 
-        // 自分の回数を増やす
-        myCount++;
+        // サーバーが返した正確な数字に合わせる
+        globalCountText.textContent = result.count + "回";
+    } catch (error) {
+        console.error(error);
+
+        // 失敗した場合は元の数字に戻す
+        myCount = previousMyCount;
         localStorage.setItem("peaceCount", myCount);
 
-        // 回数表示を更新
         myCountText.textContent = myCount + "回";
-        globalCountText.textContent = result.count + "回";
+        globalCountText.textContent = previousGlobalCount + "回";
 
-        // 「平和 +1」の演出
-        peaceMessage.textContent = "🕊️ 平和 +1";
-        peaceMessage.classList.remove("show");
-
-        // 同じアニメーションを毎回再生するため
-        void peaceMessage.offsetWidth;
-
-        peaceMessage.classList.add("show");
-        button.classList.add("pressed");
-
+        peaceMessage.textContent = "更新に失敗しました";
+    } finally {
         setTimeout(() => {
             button.classList.remove("pressed");
             peaceMessage.classList.remove("show");
         }, 800);
-    } catch (error) {
-        console.error(error);
-        alert("世界の回数を更新できませんでした。");
-    } finally {
+
         button.disabled = false;
     }
 });
