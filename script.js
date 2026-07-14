@@ -27,6 +27,9 @@ async function loadGlobalCount() {
 // 最初に世界の回数を表示
 loadGlobalCount();
 
+// 5秒ごとに世界の回数を更新
+setInterval(loadGlobalCount, 5000);
+
 // ボタンを押したとき
 button.addEventListener("click", async () => {
     button.disabled = true;
