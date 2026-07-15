@@ -5,8 +5,14 @@ console.log(process.env.SUPABASE_URL);
 const express = require("express");
 const { createClient } = require("@supabase/supabase-js");
 
+const http = require("http");
+const { Server } = require("socket.io");
+
 const app = express();
-const PORT = 3000;
+const server = http.createServer(app);
+const io = new Server(server);
+
+const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.static(__dirname));
@@ -58,6 +64,8 @@ app.post("/api/count", async (req, res) => {
             });
         }
 
+        io.emit("countUpdated", Number(data));
+
         res.json({
             success: true,
             count: Number(data)
@@ -84,6 +92,6 @@ app.get("/debug", async (req, res) => {
     });
 });
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`http://localhost:${PORT}`);
 });

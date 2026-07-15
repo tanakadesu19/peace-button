@@ -2,6 +2,7 @@ const button = document.getElementById("peaceButton");
 const myCountText = document.getElementById("myCount");
 const globalCountText = document.getElementById("globalCount");
 const peaceMessage = document.getElementById("peaceMessage");
+const socket = io();
 
 // 自分の回数を読み込む
 let myCount = Number(localStorage.getItem("peaceCount")) || 0;
@@ -26,6 +27,10 @@ async function loadGlobalCount() {
 
 // 最初に世界の回数を表示
 loadGlobalCount();
+
+socket.on("countUpdated", (newCount) => {
+    globalCountText.textContent = newCount + "回";
+});
 
 // 5秒ごとに世界の回数を更新
 setInterval(loadGlobalCount, 5000);
