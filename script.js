@@ -32,9 +32,6 @@ socket.on("countUpdated", (newCount) => {
     globalCountText.textContent = newCount + "回";
 });
 
-// 5秒ごとに世界の回数を更新
-setInterval(loadGlobalCount, 5000);
-
 // ボタンを押したとき
 button.addEventListener("click", async () => {
     button.disabled = true;
