@@ -3,6 +3,7 @@ const myCountText = document.getElementById("myCount");
 const globalCountText = document.getElementById("globalCount");
 const peaceMessage = document.getElementById("peaceMessage");
 const socket = io();
+const loadingScreen = document.getElementById("loadingScreen");
 
 // 自分の回数を読み込む
 let myCount = Number(localStorage.getItem("peaceCount")) || 0;
@@ -22,6 +23,12 @@ async function loadGlobalCount() {
     } catch (error) {
         console.error(error);
         globalCountText.textContent = "取得エラー";
+    } finally {
+        loadingScreen.classList.add("hidden");
+
+        setTimeout(() => {
+            loadingScreen.style.display = "none";
+        }, 400);
     }
 }
 

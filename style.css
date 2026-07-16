@@ -111,3 +111,58 @@ h1 {
         font-size: 27px;
     }
 }
+
+#loadingScreen {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    background: #f5fff7;
+    font-size: 20px;
+
+    transition: opacity 0.4s ease;
+}
+
+#loadingScreen.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.loadingBird {
+    margin-bottom: 20px;
+    animation: floatingBird 1.2s ease-in-out infinite;
+}
+
+.loadingBird img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+}
+
+@keyframes floatingBird {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-12px);
+    }
+}
+
+.title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+}
+
+.title img {
+    width: 42px;
+    height: 42px;
+}
