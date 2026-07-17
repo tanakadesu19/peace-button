@@ -49,35 +49,65 @@ app.get("/api/count", async (req, res) => {
     });
 });
 
-app.post("/api/count", async (req, res) => {
-    try {
-        const { data, error } = await supabase.rpc(
-            "increment_peace_count"
-        );
+app.get("/api/today-count", async (req, res) => {
+    const today = new Date().toLocaleDateString("sv-SE", {
+        timeZone: "Asia/Tokyo"
+    });
 
-        if (error) {
-            console.error("UPDATE ERROR:", error);
+    const { data, error } = await supabase
+        .from("peace_daily_counts")
+        .select("count")
+        .eq("count_date", today)
+        .maybeSingle();
 
-            return res.status(500).json({
-                success: false,
-                message: "世界の回数を更新できませんでした"
-            });
-        }
+    if (error) {
+        console.error("TODAY COUNT ERROR:", error);
 
-        io.emit("countUpdated", Number(data));
-
-        res.json({
-            success: true,
-            count: Number(data)
-        });
-    } catch (error) {
-        console.error("SERVER ERROR:", error);
-
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
-            message: "サーバーでエラーが発生しました"
+            message: "今日の回数を取得できませんでした"
         });
     }
+
+    res.json({
+        success: true,
+        count: data?.count ?? 0
+    });
+});
+
+app.post("/api/count", async (req, res) => {
+    const { data, error } = await supabase.rpc(
+        "increment_peace_counts"
+    );
+
+    if (error) {
+        console.error("INCREMENT ERROR:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "回数を更新できませんでした"
+        });
+    }
+
+    const result = data?.[0];
+
+    if (!result) {
+        return res.status(500).json({
+            success: false,
+            message: "更新結果を取得できませんでした"
+        });
+    }
+
+    io.emit("countUpdated", {
+        totalCount: Number(result.total_count),
+        todayCount: Number(result.today_count)
+    });
+
+    res.json({
+        success: true,
+        totalCount: Number(result.total_count),
+        todayCount: Number(result.today_count)
+    });
 });
 
 app.get("/debug", async (req, res) => {

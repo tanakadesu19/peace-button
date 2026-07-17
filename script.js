@@ -1,15 +1,17 @@
 const button = document.getElementById("peaceButton");
 const myCountText = document.getElementById("myCount");
 const globalCountText = document.getElementById("globalCount");
+const todayCountText = document.getElementById("todayCount");
 const peaceMessage = document.getElementById("peaceMessage");
-const socket = io();
 const loadingScreen = document.getElementById("loadingScreen");
+
+const socket = io();
 
 // 自分の回数を読み込む
 let myCount = Number(localStorage.getItem("peaceCount")) || 0;
 myCountText.textContent = myCount + "回";
 
-// 世界の回数を取得
+// 世界の回数を読み込む
 async function loadGlobalCount() {
     try {
         const response = await fetch("/api/count");
@@ -32,36 +34,68 @@ async function loadGlobalCount() {
     }
 }
 
-// 最初に世界の回数を表示
-loadGlobalCount();
+// 今日の回数を読み込む
+async function loadTodayCount() {
+    try {
+        const response = await fetch("/api/today-count");
+        const result = await response.json();
 
-socket.on("countUpdated", (newCount) => {
-    globalCountText.textContent = newCount + "回";
+        if (!response.ok || !result.success) {
+            throw new Error(result.message || "取得に失敗しました");
+        }
+
+        todayCountText.textContent = result.count + "回";
+    } catch (error) {
+        console.error(error);
+        todayCountText.textContent = "取得エラー";
+    }
+}
+
+// 最初の読み込み
+loadGlobalCount();
+loadTodayCount();
+
+// リアルタイム更新
+socket.on("countUpdated", (counts) => {
+    globalCountText.textContent = counts.totalCount + "回";
+    todayCountText.textContent = counts.todayCount + "回";
 });
 
 // ボタンを押したとき
 button.addEventListener("click", async () => {
+    if (button.disabled) {
+        return;
+    }
+
     button.disabled = true;
 
-    // 押した瞬間に画面を反応させる
+    // 更新前の数字を保存
     const previousMyCount = myCount;
+
     const previousGlobalCount =
         Number(globalCountText.textContent.replace("回", "")) || 0;
 
+    const previousTodayCount =
+        Number(todayCountText.textContent.replace("回", "")) || 0;
+
+    // 押した瞬間に仮の数字を表示
     myCount++;
     localStorage.setItem("peaceCount", myCount);
 
     myCountText.textContent = myCount + "回";
     globalCountText.textContent = previousGlobalCount + 1 + "回";
+    todayCountText.textContent = previousTodayCount + 1 + "回";
 
+    // 演出
     peaceMessage.textContent = "🕊️ 平和 +1";
     peaceMessage.classList.remove("show");
     void peaceMessage.offsetWidth;
     peaceMessage.classList.add("show");
+
     button.classList.add("pressed");
 
     try {
-        // 裏側でサーバーへ送信
+        // サーバーに更新を送る
         const response = await fetch("/api/count", {
             method: "POST"
         });
@@ -72,17 +106,19 @@ button.addEventListener("click", async () => {
             throw new Error(result.message || "更新に失敗しました");
         }
 
-        // サーバーが返した正確な数字に合わせる
-        globalCountText.textContent = result.count + "回";
+        // サーバーから返った正確な数字に合わせる
+        globalCountText.textContent = result.totalCount + "回";
+        todayCountText.textContent = result.todayCount + "回";
     } catch (error) {
         console.error(error);
 
-        // 失敗した場合は元の数字に戻す
+        // 失敗したら元の数字に戻す
         myCount = previousMyCount;
         localStorage.setItem("peaceCount", myCount);
 
-        myCountText.textContent = myCount + "回";
+        myCountText.textContent = previousMyCount + "回";
         globalCountText.textContent = previousGlobalCount + "回";
+        todayCountText.textContent = previousTodayCount + "回";
 
         peaceMessage.textContent = "更新に失敗しました";
     } finally {
