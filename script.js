@@ -15,6 +15,9 @@ const loadingText = document.getElementById("loadingText");
 // 言語切り替えボタン
 const languageButton = document.getElementById("languageButton");
 
+// ボタン効果音
+const clickSound = new Audio("click.mp3");
+
 // 翻訳データ
 const translations = {
     ja: {
@@ -153,6 +156,11 @@ socket.on("countUpdated", (counts) => {
 
 // ボタンを押したとき
 button.addEventListener("click", async () => {
+
+    clickSound.currentTime = 0;
+    clickSound.play();
+    clickSound.volume = 0.4;
+
     if (button.disabled) {
         return;
     }
