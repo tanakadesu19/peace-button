@@ -32,20 +32,29 @@
     <link rel="stylesheet" href="style.css">
 
 </head>
+
 <body>
+
+    <div class="language-switch">
+        <button id="languageButton" type="button">
+        English
+        </button>
+    </div>
 
     <div id="loadingScreen">
         <div class="loadingBird">
-        <img src="favicon_4.png" alt="平和ボタン ロゴ">
-    </div>
-        <p>平和ボタンを準備しています…</p>
+            <img src="favicon_4.png" alt="平和ボタン ロゴ">
+        </div>
+
+        <p id="loadingText">
+            平和ボタンを準備しています…
+        </p>
     </div>
 
     <h1 class="title">
         <img src="favicon_4.png" alt="ロゴ">
-        平和ボタン
+        <span id="pageTitle">平和ボタン</span>
     </h1>
-
     <button id="peaceButton">
         平和
     </button>
@@ -54,7 +63,7 @@
 
     <div class="info">
 
-        <p>
+        <p id="myCountLabel">
             あなたが押した回数
         </p>
 
@@ -62,7 +71,7 @@
             0回
         </h2>
 
-        <p>
+        <p id="globalCountLabel">
             世界のみんなが押した回数
         </p>
 
@@ -70,8 +79,8 @@
             0回
         </h2>
 
-        <p>
-        今日押された回数
+        <p id="todayCountLabel">
+            今日押された回数
         </p>
 
         <h2 id="todayCount">
@@ -80,8 +89,9 @@
 
     </div>
 
-<script src="/socket.io/socket.io.js"></script>
-<script src="script.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
 
 </body>
+
 </html>
