@@ -23,11 +23,12 @@ h1 {
     border-radius: 50%;
     background: #4caf50;
     color: white;
-    font-size: 42px;
+    font-size: clamp(24px, 7vw, 36px);
     font-weight: bold;
     cursor: pointer;
     box-shadow: 0 10px 0 #388e3c, 0 16px 24px rgba(0, 0, 0, 0.18);
     transition: transform 0.08s, box-shadow 0.08s;
+    white-space: nowrap;
 }
 
 #peaceButton:hover {
@@ -46,15 +47,17 @@ h1 {
 }
 
 #peaceMessage {
-    height: 32px;
-    margin: 22px 0 0;
-    color: #2e7d32;
-    font-size: 22px;
-    font-weight: bold;
+    opacity: 0;
+    transform: translateY(8px);
+    pointer-events: none;
+    transition:
+        opacity 0.35s ease,
+        transform 0.35s ease;
 }
 
 #peaceMessage.show {
-    animation: floatMessage 0.8s ease-out;
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .info {
@@ -193,4 +196,47 @@ h1 {
 
 .language-switch button:active {
     transform: scale(0.95);
+}
+
+/*ボタン切り替え*/
+.button-switcher {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+}
+
+.switch-button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 999px;
+    background: #e5e7eb;
+    color: #333;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: bold;
+    transition: all 0.25s ease;
+}
+
+.switch-button:hover {
+    transform: translateY(-2px);
+    background: #d1d5db;
+}
+
+.switch-button.active {
+    background: #22c55e;
+    color: white;
+    transform: scale(1.05);
+}
+
+@media (max-width: 600px) {
+    .button-switcher {
+        gap: 8px;
+    }
+
+    .switch-button {
+        font-size: 14px;
+        padding: 8px 14px;
+    }
 }

@@ -44,8 +44,61 @@ const translations = {
         updateError: "Update failed",
         countSuffix: "",
         fetchError: "Failed to load"
+    }    
+
+};
+
+// 各ボタンの設定
+const buttonSettings = {
+    peace: {
+        ja: {
+            title: " 平和ボタン",
+            button: "平和",
+            menu: "🕊️ 平和",
+            plusOne: "🕊️ 平和 +1"
+        },
+        en: {
+            title: " Peace Button",
+            button: "Peace",
+            menu: "🕊️ Peace",
+            plusOne: "🕊️ Peace +1"
+        }
+    },
+
+    love: {
+        ja: {
+            title: " 大好きボタン",
+            button: "大好き",
+            menu: "❤️ 大好き",
+            plusOne: "❤️ 大好き +1"
+        },
+        en: {
+            title: " Love Button",
+            button: "Love",
+            menu: "❤️ Love",
+            plusOne: "❤️ Love +1"
+        }
+    },
+
+    thanks: {
+        ja: {
+            title: " ありがとうボタン",
+            button: "ありがとう",
+            menu: "🙏 ありがとう",
+            plusOne: "🙏 ありがとう +1"
+        },
+        en: {
+            title: " Thanks Button",
+            button: "Thanks",
+            menu: "🙏 Thanks",
+            plusOne: "🙏 Thanks +1"
+        }
     }
 };
+
+// 切り替えメニューのボタン
+const switchButtons =
+    document.querySelectorAll(".switch-button");
 
 // 言語を判定して表示を変更
 const browserLanguage = navigator.language.toLowerCase();
@@ -61,8 +114,12 @@ function applyLanguage() {
 
     document.documentElement.lang = language;
 
-    pageTitle.textContent = text.title;
-    button.textContent = text.button;
+    const currentSettings =
+        buttonSettings[currentButton][language];
+
+    pageTitle.textContent = currentSettings.title;
+    button.textContent = currentSettings.button;
+
     myCountLabel.textContent = text.myCountLabel;
     globalCountLabel.textContent = text.globalCountLabel;
     todayCountLabel.textContent = text.todayCountLabel;
@@ -85,10 +142,26 @@ function applyLanguage() {
 
     languageButton.textContent =
         language === "ja" ? "English" : "日本語";
+
+    switchButtons.forEach((switchButton) => {
+        const buttonKey = switchButton.dataset.button;
+
+        switchButton.textContent =
+            buttonSettings[buttonKey][language].menu;
+});
 }
 
 // 自分の回数を読み込む
-let myCount = Number(localStorage.getItem("peaceCount")) || 0;
+let currentButton =
+    localStorage.getItem("selectedButton") || "peace";
+
+// 不正なボタン名だった場合はpeaceに戻す
+if (!buttonSettings[currentButton]) {
+    currentButton = "peace";
+}
+
+let myCount =
+    Number(localStorage.getItem(`${currentButton}Count`)) || 0;
 
 applyLanguage();
 
@@ -104,7 +177,9 @@ languageButton.addEventListener("click", () => {
 // 世界の回数を読み込む
 async function loadGlobalCount() {
     try {
-        const response = await fetch("/api/count");
+        const response =
+            await fetch(`/api/count/${currentButton}`);
+
         const result = await response.json();
 
         if (!response.ok || !result.success) {
@@ -127,7 +202,9 @@ async function loadGlobalCount() {
 // 今日の回数を読み込む
 async function loadTodayCount() {
     try {
-        const response = await fetch("/api/today-count");
+        const response =
+            await fetch(`/api/today-count/${currentButton}`);
+
         const result = await response.json();
 
         if (!response.ok || !result.success) {
@@ -141,17 +218,92 @@ async function loadTodayCount() {
     }
 }
 
+// 最初に選択中のボタンを表示
+switchButtons.forEach((switchButton) => {
+    const isActive =
+        switchButton.dataset.button === currentButton;
+
+    switchButton.classList.toggle(
+        "active",
+        isActive
+    );
+});
+
 // 最初の読み込み
 loadGlobalCount();
 loadTodayCount();
 
 // リアルタイム更新
 socket.on("countUpdated", (counts) => {
+
+    if (counts.buttonKey !== currentButton) {
+        return;
+    }
+
     globalCountText.textContent =
         counts.totalCount + text.countSuffix;
 
     todayCountText.textContent =
         counts.todayCount + text.countSuffix;
+});
+
+// ボタンの種類を切り替える
+async function changeButton(buttonKey) {
+    if (!buttonSettings[buttonKey]) {
+        return;
+    }
+
+    if (buttonKey === currentButton) {
+        return;
+    }
+
+    currentButton = buttonKey;
+
+    localStorage.setItem(
+        "selectedButton",
+        currentButton
+    );
+
+    // 選択したボタン専用の自分の回数を読み込む
+    myCount =
+        Number(
+            localStorage.getItem(
+                `${currentButton}Count`
+            )
+        ) || 0;
+
+    // 選択中の見た目を変更
+    switchButtons.forEach((switchButton) => {
+        const isActive =
+            switchButton.dataset.button === currentButton;
+
+        switchButton.classList.toggle(
+            "active",
+            isActive
+        );
+    });
+
+    // 切り替え直後の表示
+    globalCountText.textContent = "…";
+    todayCountText.textContent = "…";
+
+    applyLanguage();
+
+    // 選択したボタンの回数を取得
+    await Promise.all([
+        loadGlobalCount(),
+        loadTodayCount()
+    ]);
+}
+
+// 切り替えメニューを押したとき
+switchButtons.forEach((switchButton) => {
+    switchButton.addEventListener("click", () => {
+        const buttonKey =
+            switchButton.dataset.button;
+
+        changeButton(buttonKey);
+    });
 });
 
 // ボタンを押したとき
@@ -178,7 +330,7 @@ button.addEventListener("click", async () => {
 
     // 押した瞬間に仮の数字を表示
     myCount++;
-    localStorage.setItem("peaceCount", myCount);
+    localStorage.setItem(`${currentButton}Count`, myCount);
 
     myCountText.textContent = myCount + text.countSuffix;
     globalCountText.textContent =
@@ -187,7 +339,10 @@ button.addEventListener("click", async () => {
         previousTodayCount + 1 + text.countSuffix;
 
     // 演出
-    peaceMessage.textContent = text.peacePlusOne;
+    // 押したときのメッセージ
+    peaceMessage.textContent =
+        buttonSettings[currentButton][language].plusOne;
+
     peaceMessage.classList.remove("show");
     void peaceMessage.offsetWidth;
     peaceMessage.classList.add("show");
@@ -196,7 +351,7 @@ button.addEventListener("click", async () => {
 
     try {
         // サーバーに更新を送る
-        const response = await fetch("/api/count", {
+        const response = await fetch(`/api/count/${currentButton}`, {
             method: "POST"
         });
 
@@ -217,7 +372,7 @@ button.addEventListener("click", async () => {
 
         // 失敗したら元の数字に戻す
         myCount = previousMyCount;
-        localStorage.setItem("peaceCount", myCount);
+        localStorage.setItem(`${currentButton}Count`, myCount);
 
         myCountText.textContent = previousMyCount + "回";
         globalCountText.textContent = previousGlobalCount + "回";
@@ -231,7 +386,7 @@ button.addEventListener("click", async () => {
 
         setTimeout(() => {
             peaceMessage.classList.remove("show");
-        }, 700);
+        }, 900);
 
         button.disabled = false;
     }

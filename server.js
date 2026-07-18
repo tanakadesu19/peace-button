@@ -28,11 +28,12 @@ const supabase = createClient(
     }
 );
 
-app.get("/api/count", async (req, res) => {
+app.get("/api/count/:buttonKey", async (req, res) => {
+    const { buttonKey } = req.params;
     const { data, error } = await supabase
-        .from("peace_count")
+        .from("button_counts")
         .select("count")
-        .eq("id", 1)
+        .eq("button_key", buttonKey)
         .single();
 
     if (error) {
@@ -49,14 +50,17 @@ app.get("/api/count", async (req, res) => {
     });
 });
 
-app.get("/api/today-count", async (req, res) => {
+app.get("/api/today-count/:buttonKey", async (req, res) => {
+    const { buttonKey } = req.params;
+
     const today = new Date().toLocaleDateString("sv-SE", {
         timeZone: "Asia/Tokyo"
     });
 
     const { data, error } = await supabase
-        .from("peace_daily_counts")
+        .from("button_daily_counts")
         .select("count")
+        .eq("button_key", buttonKey)
         .eq("count_date", today)
         .maybeSingle();
 
@@ -75,9 +79,15 @@ app.get("/api/today-count", async (req, res) => {
     });
 });
 
-app.post("/api/count", async (req, res) => {
+app.post("/api/count/:buttonKey", async (req, res) => {
+
+    const { buttonKey } = req.params;
+
     const { data, error } = await supabase.rpc(
-        "increment_peace_counts"
+        "increment_button_counts",
+        {
+            p_button_key: buttonKey
+        }
     );
 
     if (error) {
@@ -98,15 +108,20 @@ app.post("/api/count", async (req, res) => {
         });
     }
 
+    const totalCount = Number(result.total_count);
+    const todayCount = Number(result.today_count);
+
     io.emit("countUpdated", {
-        totalCount: Number(result.total_count),
-        todayCount: Number(result.today_count)
+        buttonKey,
+        totalCount,
+        todayCount
     });
 
     res.json({
         success: true,
-        totalCount: Number(result.total_count),
-        todayCount: Number(result.today_count)
+        buttonKey,
+        totalCount,
+        todayCount
     });
 });
 
