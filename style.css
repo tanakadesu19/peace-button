@@ -26,7 +26,9 @@ h1 {
     font-size: clamp(24px, 7vw, 36px);
     font-weight: bold;
     cursor: pointer;
-    box-shadow: 0 10px 0 #388e3c, 0 16px 24px rgba(0, 0, 0, 0.18);
+    box-shadow:
+        0 10px 0 var(--button-shadow-color, #388e3c),
+        0 16px 24px rgba(0, 0, 0, 0.18);
     transition: transform 0.08s, box-shadow 0.08s;
     white-space: nowrap;
 }
@@ -38,7 +40,9 @@ h1 {
 #peaceButton:active,
 #peaceButton.pressed {
     transform: translateY(7px) scale(0.97);
-    box-shadow: 0 3px 0 #388e3c, 0 7px 12px rgba(0, 0, 0, 0.15);
+    box-shadow:
+        0 3px 0 var(--button-shadow-color, #388e3c),
+        0 7px 12px rgba(0, 0, 0, 0.15);
 }
 
 #peaceButton:disabled {
@@ -238,5 +242,49 @@ h1 {
     .switch-button {
         font-size: 14px;
         padding: 8px 14px;
+    }
+}
+
+/*ロゴ系*/
+.header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 24px;
+    box-sizing: border-box;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo img {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+    display: block;
+}
+
+.logo span {
+    font-size: 20px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+    .header {
+        padding: 10px 14px;
+    }
+
+    .logo img {
+        width: 34px;
+        height: 34px;
+    }
+
+    .logo span {
+        font-size: 16px;
     }
 }

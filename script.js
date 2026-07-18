@@ -51,6 +51,10 @@ const translations = {
 // 各ボタンの設定
 const buttonSettings = {
     peace: {
+
+        color: "#4CAF50",
+        shadowColor: "#2e7d32",
+
         ja: {
             title: " 平和ボタン",
             button: "平和",
@@ -66,6 +70,10 @@ const buttonSettings = {
     },
 
     love: {
+
+        color: "#ef476f",
+        shadowColor: "#b52f50",
+
         ja: {
             title: " 大好きボタン",
             button: "大好き",
@@ -81,6 +89,10 @@ const buttonSettings = {
     },
 
     thanks: {
+
+        color: "#f59e0b",
+        shadowColor: "#b96d00",
+
         ja: {
             title: " ありがとうボタン",
             button: "ありがとう",
@@ -117,8 +129,20 @@ function applyLanguage() {
     const currentSettings =
         buttonSettings[currentButton][language];
 
-    pageTitle.textContent = currentSettings.title;
+    pageTitle.textContent =
+        language === "ja"
+            ? `${currentSettings.menu}ボタン`
+            : `${currentSettings.menu} Button`;
+
     button.textContent = currentSettings.button;
+
+    button.style.backgroundColor =    
+        buttonSettings[currentButton].color;
+
+    button.style.setProperty(
+        "--button-shadow-color",
+        buttonSettings[currentButton].shadowColor
+    );
 
     myCountLabel.textContent = text.myCountLabel;
     globalCountLabel.textContent = text.globalCountLabel;
@@ -148,7 +172,17 @@ function applyLanguage() {
 
         switchButton.textContent =
             buttonSettings[buttonKey][language].menu;
-});
+
+        if (buttonKey === currentButton) {
+            switchButton.style.backgroundColor =
+                buttonSettings[buttonKey].color;
+
+            switchButton.style.color = "white";
+        } else {
+            switchButton.style.backgroundColor = "";
+            switchButton.style.color = "";
+        }
+    });
 }
 
 // 自分の回数を読み込む
