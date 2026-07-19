@@ -248,18 +248,24 @@ h1 {
 }
 
 @media (max-width: 600px) {
-    .header {
-        min-height: 56px;
-        padding: 8px 14px;
+
+    .button-switcher {
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+
+        overflow-x: auto;
+        overflow-y: hidden;
+
+        padding-bottom: 8px;
+
+        -webkit-overflow-scrolling: touch;
     }
 
-    .logo img {
-        width: 34px;
-        height: 34px;
-    }
+    .switch-button {
+        flex: 0 0 auto;
 
-    .logo span {
-        font-size: 16px;
+        font-size: 14px;
+        padding: 8px 16px;
     }
 }
 
@@ -327,7 +333,7 @@ h1 {
 
 @media (max-width: 600px) {
     #peaceMessage {
-        top: -45px;
+        top: -65px;
         left: 50%;
         transform: translateX(-50%) translateY(8px);
     }
@@ -335,4 +341,12 @@ h1 {
     #peaceMessage.show {
         transform: translateX(-50%) translateY(-8px);
     }
+}
+
+.button-switcher::-webkit-scrollbar {
+    display: none;
+}
+
+.button-switcher {
+    scrollbar-width: none;
 }
