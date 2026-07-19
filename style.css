@@ -5,7 +5,7 @@
 body {
     min-height: 100vh;
     margin: 0;
-    padding: 40px 20px;
+    padding: 0 20px 40px;
     font-family: sans-serif;
     text-align: center;
     background: linear-gradient(#eaf8ff, #f5fff7);
@@ -51,17 +51,31 @@ h1 {
 }
 
 #peaceMessage {
+    position: absolute;
+
+    top: 100px;
+    left: calc(100% + 16px);
+
+    margin: 0;
+
     opacity: 0;
     transform: translateY(8px);
+
     pointer-events: none;
+
+    font-size: 22px;
+    font-weight: bold;
+
+    white-space: nowrap;
+
     transition:
-        opacity 0.35s ease,
-        transform 0.35s ease;
+        opacity .35s ease,
+        transform .35s ease;
 }
 
 #peaceMessage.show {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(-12px);
 }
 
 .info {
@@ -178,10 +192,7 @@ h1 {
 /*言語変更ボタン*/
 
 .language-switch {
-    position: fixed;
-    top: 16px;
-    right: 16px;
-    z-index: 100;
+    position: static;
 }
 
 .language-switch button {
@@ -207,7 +218,7 @@ h1 {
     display: flex;
     justify-content: center;
     gap: 12px;
-    margin: 20px 0;
+    margin: 28px 0 20px;
     flex-wrap: wrap;
 }
 
@@ -235,24 +246,42 @@ h1 {
 }
 
 @media (max-width: 600px) {
-    .button-switcher {
-        gap: 8px;
+    .header {
+        min-height: 56px;
+        padding: 8px 14px;
     }
 
-    .switch-button {
-        font-size: 14px;
-        padding: 8px 14px;
+    .logo img {
+        width: 34px;
+        height: 34px;
+    }
+
+    .logo span {
+        font-size: 16px;
     }
 }
 
 /*ロゴ系*/
 .header {
-    width: 100%;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+
+    width: calc(100% + 40px);
+    margin-left: -20px;
+
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 14px 24px;
-    box-sizing: border-box;
+
+    min-height: 64px;
+    padding: 10px 24px;
+
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .logo {
@@ -262,16 +291,16 @@ h1 {
 }
 
 .logo img {
-    width: 42px;
-    height: 42px;
+    width: 48px;
+    height: 48px;
     object-fit: contain;
     display: block;
 }
 
 .logo span {
-    font-size: 20px;
-    font-weight: bold;
-    white-space: nowrap;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: .5px;
 }
 
 @media (max-width: 600px) {
@@ -287,4 +316,9 @@ h1 {
     .logo span {
         font-size: 16px;
     }
+}
+
+.button-area {
+    position: relative;
+    display: inline-block;
 }
