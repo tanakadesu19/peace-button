@@ -344,8 +344,9 @@ switchButtons.forEach((switchButton) => {
 button.addEventListener("click", async () => {
 
     clickSound.currentTime = 0;
-    clickSound.play();
     clickSound.volume = 0.4;
+
+    clickSound.play().catch(() => {});
 
     if (button.disabled) {
         return;
