@@ -332,14 +332,23 @@ h1 {
 }
 
 @media (max-width: 600px) {
+    .button-area {
+        margin-bottom: 55px;
+    }
+
     #peaceMessage {
-        top: -65px;
+        top: calc(100% + 12px);
         left: 50%;
-        transform: translateX(-50%) translateY(8px);
+
+        width: max-content;
+        max-width: calc(100vw - 32px);
+
+        transform: translateX(-50%) translateY(-8px);
+        white-space: nowrap;
     }
 
     #peaceMessage.show {
-        transform: translateX(-50%) translateY(-8px);
+        transform: translateX(-50%) translateY(8px);
     }
 }
 
